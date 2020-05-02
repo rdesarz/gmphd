@@ -4,6 +4,19 @@ from gmphd.gaussian_component import GaussianComponent
 import numpy as np
 
 
+class TestBirthModel:
+    def __call__(self):
+        birth_intensity = list()
+        mean = np.array([5., 5., 0.5, 0.5]).transpose()
+        covariance = np.array([[1., 0., 0., 0.],
+                               [0., 1., 0., 0.],
+                               [0., 0., 1., 0.],
+                               [0., 0., 0., 1.]])
+        weight = 1.
+        birth_intensity.append(GaussianComponent(mean=mean, covariance=covariance, weight=weight))
+        return birth_intensity
+
+
 class TestPrediction(TestCase):
     def test_predict_single_component(self):
         dynamic_model = np.array([[1., 0., 1., 0.],
@@ -24,7 +37,7 @@ class TestPrediction(TestCase):
         gaussian_components = list()
         gaussian_components.append(GaussianComponent(mean, covariance, weight))
 
-        predict(gaussian_components, dynamic_model, process_noise, prob_survival)
+        predict(gaussian_components, dynamic_model, process_noise, prob_survival, TestBirthModel())
 
         self.assertTrue(np.allclose(gaussian_components[0].mean, [1.5, 1.5, 0.5, 0.5]))
         self.assertTrue(np.allclose(gaussian_components[0].covariance, np.array([[2.05, 0.05, 1.05, 0.05],
@@ -32,6 +45,13 @@ class TestPrediction(TestCase):
                                                                                  [1.05, 0.05, 1.05, 0.05],
                                                                                  [0.05, 1.05, 0.05, 1.05]])))
         self.assertAlmostEqual(gaussian_components[0].weight, 0.95)
+
+        self.assertTrue(np.allclose(gaussian_components[1].mean, [5., 5., 0.5, 0.5]))
+        self.assertTrue(np.allclose(gaussian_components[1].covariance, np.array([[1., 0., 0., 0.],
+                                                                                 [0., 1., 0., 0.],
+                                                                                 [0., 0., 1., 0.],
+                                                                                 [0., 0., 0., 1.]])))
+        self.assertAlmostEqual(gaussian_components[1].weight, 1.)
 
     def test_predict_multiple_components(self):
         dynamic_model = np.array([[1., 0., 1., 0.],
@@ -53,7 +73,7 @@ class TestPrediction(TestCase):
         gaussian_components.append(GaussianComponent(mean, covariance, weight))
         gaussian_components.append(GaussianComponent(mean, covariance, weight))
 
-        predict(gaussian_components, dynamic_model, process_noise, prob_survival)
+        predict(gaussian_components, dynamic_model, process_noise, prob_survival, TestBirthModel())
 
         self.assertTrue(np.allclose(gaussian_components[0].mean, [1.5, 1.5, 0.5, 0.5]))
         self.assertTrue(np.allclose(gaussian_components[0].covariance, np.array([[2.05, 0.05, 1.05, 0.05],
@@ -67,4 +87,3 @@ class TestPrediction(TestCase):
                                                                                  [1.05, 0.05, 1.05, 0.05],
                                                                                  [0.05, 1.05, 0.05, 1.05]])))
         self.assertAlmostEqual(gaussian_components[1].weight, 0.95)
-

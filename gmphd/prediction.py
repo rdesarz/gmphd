@@ -1,7 +1,9 @@
-def predict(gaussian_mixture, dynamic_model, process_noise, prob_survival):
-    for component in gaussian_mixture:
-        component.mean = dynamic_model.dot(component.mean)
-        component.covariance = dynamic_model.dot(component.covariance).dot(dynamic_model.transpose()) + process_noise
-        component.weight = component.weight * prob_survival
+def predict(intensity, dynamic_model, process_noise, prob_survival, birth_intensity):
+    for gaussian in intensity:
+        gaussian.mean = dynamic_model.dot(gaussian.mean)
+        gaussian.covariance = dynamic_model.dot(gaussian.covariance).dot(dynamic_model.transpose()) + process_noise
+        gaussian.weight = gaussian.weight * prob_survival
 
-    return gaussian_mixture
+    intensity.extend(birth_intensity())
+
+    return intensity
