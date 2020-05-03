@@ -21,7 +21,7 @@ measurement_1 = np.array([2., 2.]).transpose()
 measurement_2 = np.array([1., 1.]).transpose()
 measurements = [measurement_1, measurement_2]
 
-clutter_model = clutter_model.Poisson(1, 1)
+clutter_model = clutter_model.Constant(1.)
 
 
 class TestUpdate(TestCase):
@@ -94,4 +94,3 @@ class TestUpdate(TestCase):
         intensity.append(GaussianComponent(gaussian_mean, gaussian_cov, gaussian_weight))
 
         intensity = update(intensity, measurements, measurement_model, measurement_noise, prob_detection, clutter_model)
-
