@@ -1,7 +1,8 @@
 from numpy.linalg import inv
+from numpy import float64
 from math import fsum
 from gmphd.gaussian_component import GaussianComponent
-from collections import namedtuple
+
 
 
 def prune(posterior_intensity, truncation_threshold):
@@ -39,7 +40,7 @@ def merge_gaussians(gaussians_list):
     covariance = sum(
         (gaussian.covariance + (mean - gaussian.mean).transpose().dot((mean - gaussian.mean))).dot(gaussian.weight) for
         gaussian in gaussians_list).dot(
-        1. / weight)
+        float64(1.) / weight)
 
     return GaussianComponent(weight=weight, mean=mean, covariance=covariance)
 
