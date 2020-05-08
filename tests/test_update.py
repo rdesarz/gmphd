@@ -5,6 +5,10 @@ from gmphd.gaussian_component import GaussianComponent
 from gmphd.update import *
 import gmphd.clutter_model as clutter_model
 
+import math
+
+from copy import deepcopy
+
 # Parameters for the tests
 gaussian_mean = np.array([1., 1., 0.5, 0.5]).transpose()
 gaussian_cov = np.array([[1., 0., 0., 0.],
@@ -12,7 +16,7 @@ gaussian_cov = np.array([[1., 0., 0., 0.],
                          [0., 0., 1., 0.],
                          [0., 0., 0., 1.]])
 gaussian_weight = 1.
-prob_detection = 0.95
+prob_detection = 0.5
 measurement_model = np.array([[1., 0., 0., 0.],
                               [0., 1., 0., 0.]])
 measurement_noise = np.array([[1., 0.],
@@ -89,8 +93,63 @@ class TestUpdate(TestCase):
                                                                          update_components.innovation_cov).pdf(
                                    measurement_1))
 
-    def test_compute_updated_intensity(self):
-        intensity = list()
-        intensity.append(GaussianComponent(gaussian_mean, gaussian_cov, gaussian_weight))
+    def test_compute_updated_intensity_with_two_components(self):
+        birth_component = GaussianComponent(np.array([2.5, 2.5, -0.1, 0.1]).transpose(),
+                                            np.array([[0.5, 0., 0., 0.],
+                                                      [0., 0.5, 0., 0.],
+                                                      [0., 0., 0.1, 0.],
+                                                      [0., 0., 0., 0.1]]),
+                                            0.1)
+        predicted_component_1 = GaussianComponent(np.array([-1.0, 2.5, 0.2, 0.1]).transpose(),
+                                                  np.array([[0.5, 0., 0., 0.],
+                                                            [0., 0.5, 0., 0.],
+                                                            [0., 0., 0.1, 0.],
+                                                            [0., 0., 0., 0.1]]),
+                                                  0.8)
+        predicted_component_2 = GaussianComponent(np.array([1.0, 2.5, 0.2, 0.1]).transpose(),
+                                                  np.array([[0.5, 0., 0., 0.],
+                                                            [0., 0.5, 0., 0.],
+                                                            [0., 0., 0.1, 0.],
+                                                            [0., 0., 0., 0.1]]),
+                                                  0.8)
+        intensity = list([deepcopy(birth_component), deepcopy(predicted_component_1), deepcopy(predicted_component_2)])
 
-        intensity = update(intensity, measurements, measurement_model, measurement_noise, prob_detection, clutter_model)
+        measures = [np.array([-1.0, 2.5]),
+                    np.array([1.2, 2.6]).transpose(),
+                    np.array([2.0, 4.0]).transpose()]
+
+        intensity = update(intensity, measures, measurement_model, measurement_noise, prob_detection, clutter_model)
+
+        # Compute updated with first measurement for test purpose
+        weight_1 = multivariate_normal.pdf(measures[0],
+                                           mean=np.array([2.5, 2.5]),
+                                           cov=np.array([[1.5, 0.],
+                                                         [0., 1.5]]))
+        weight_2 = multivariate_normal.pdf(measures[0],
+                                           mean=np.array([-1.0, 2.5]),
+                                           cov=np.array([[1.5, 0.],
+                                                         [0., 1.5]]))
+        weight_3 = multivariate_normal.pdf(measures[0],
+                                           mean=np.array([1.0, 2.5]),
+                                           cov=np.array([[1.5, 0.],
+                                                         [0., 1.5]]))
+
+        weight_1 = weight_1 * 0.1 * prob_detection
+        weight_2 = weight_2 * 0.8 * prob_detection
+        weight_3 = weight_3 * 0.8 * prob_detection
+
+        total_weight = weight_1 + weight_2 + weight_3
+
+        weight_1 = weight_1 / (total_weight + clutter_model())
+        weight_2 = weight_2 / (total_weight + clutter_model())
+        weight_3 = weight_3 / (total_weight + clutter_model())
+
+        self.assertTrue(np.allclose(intensity[0].mean, birth_component.mean))
+        self.assertTrue(np.allclose(intensity[1].mean, predicted_component_1.mean))
+        self.assertTrue(np.allclose(intensity[2].mean, predicted_component_2.mean))
+        self.assertAlmostEqual(intensity[0].weight, birth_component.weight * (1 - prob_detection))
+        self.assertAlmostEqual(intensity[1].weight, predicted_component_1.weight * (1 - prob_detection))
+        self.assertAlmostEqual(intensity[2].weight, predicted_component_2.weight * (1 - prob_detection))
+        self.assertAlmostEqual(intensity[3].weight, weight_1)
+        self.assertAlmostEqual(intensity[4].weight, weight_2)
+        self.assertAlmostEqual(intensity[5].weight, weight_3)

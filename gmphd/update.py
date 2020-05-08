@@ -1,6 +1,7 @@
 from collections import namedtuple
 from numpy.linalg import inv
 from scipy.stats import multivariate_normal
+from copy import deepcopy
 
 UpdateComponents = namedtuple('UpdateComponents',
                               ['meas_estimate', 'innovation_cov', 'kalman_gain', 'updated_cov'])
@@ -32,9 +33,9 @@ def compute_update_components(gaussian, meas_model, meas_noise):
 
 
 def compute_updated_gaussian(gaussian, measurement, update_components, prob_detection):
-    gaussian.weight = gaussian.weight * prob_detection * multivariate_normal(update_components.meas_estimate,
-                                                                             update_components.innovation_cov).pdf(
-        measurement)
+    gaussian.weight = gaussian.weight * prob_detection * multivariate_normal.pdf(measurement,
+                                                                                 mean=update_components.meas_estimate,
+                                                                                 cov=update_components.innovation_cov)
     gaussian.mean = gaussian.mean + update_components.kalman_gain.dot(
         measurement - update_components.meas_estimate)
     gaussian.covariance = update_components.updated_cov
@@ -45,7 +46,7 @@ def compute_updated_gaussian(gaussian, measurement, update_components, prob_dete
 def compute_non_detection_intensity(predicted_intensity, prob_detection):
     non_detection_intensity = list()
     for gaussian in predicted_intensity:
-        updated_component = gaussian
+        updated_component = deepcopy(gaussian)
         updated_component.weight = updated_component.weight * (1 - prob_detection)
         non_detection_intensity.append(updated_component)
 
@@ -65,9 +66,10 @@ def update(predicted_intensity, measurements, meas_model, meas_noise, prob_detec
     # For each measurement, generate a set of gaussian updated with the given measurement
     for measurement in measurements:
         measurement_updated_intensity = list()
-        total_weight = 0
+        total_weight = 0.
         for gaussian, update_component in zip(predicted_intensity, update_components):
-            updated_gaussian = compute_updated_gaussian(gaussian, measurement, update_component, prob_detection)
+            updated_gaussian = deepcopy(gaussian)
+            updated_gaussian = compute_updated_gaussian(updated_gaussian, measurement, update_component, prob_detection)
             total_weight = total_weight + updated_gaussian.weight
             measurement_updated_intensity.append(updated_gaussian)
 
