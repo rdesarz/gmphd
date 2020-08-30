@@ -27,6 +27,10 @@ measurements = [measurement_1, measurement_2]
 
 clutter_model = clutter_model.Constant(1.)
 
+agents = 5
+chunksize = 3
+pool = Pool(processes=agents)
+
 
 class TestUpdate(TestCase):
     def test_non_detected_update_components(self):
@@ -118,7 +122,7 @@ class TestUpdate(TestCase):
                     np.array([1.2, 2.6]).transpose(),
                     np.array([2.0, 4.0]).transpose()]
 
-        intensity = update(intensity, measures, measurement_model, measurement_noise, prob_detection, clutter_model)
+        intensity = update(intensity, measures, measurement_model, measurement_noise, prob_detection, clutter_model, pool)
 
         # Compute updated with first measurement for test purpose
         weight_1 = multivariate_normal.pdf(measures[0],
