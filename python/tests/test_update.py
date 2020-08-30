@@ -5,10 +5,6 @@ from gmphd.gaussian_component import GaussianComponent
 from gmphd.update import *
 import gmphd.clutter_model as clutter_model
 
-import math
-
-from copy import deepcopy
-
 # Parameters for the tests
 gaussian_mean = np.array([1., 1., 0.5, 0.5]).transpose()
 gaussian_cov = np.array([[1., 0., 0., 0.],
@@ -26,10 +22,6 @@ measurement_2 = np.array([1., 1.]).transpose()
 measurements = [measurement_1, measurement_2]
 
 clutter_model = clutter_model.Constant(1.)
-
-agents = 5
-chunksize = 3
-pool = Pool(processes=agents)
 
 
 class TestUpdate(TestCase):
@@ -122,7 +114,7 @@ class TestUpdate(TestCase):
                     np.array([1.2, 2.6]).transpose(),
                     np.array([2.0, 4.0]).transpose()]
 
-        intensity = update(intensity, measures, measurement_model, measurement_noise, prob_detection, clutter_model, pool)
+        intensity = update_intensity(intensity, measures, measurement_model, measurement_noise, prob_detection, clutter_model)
 
         # Compute updated with first measurement for test purpose
         weight_1 = multivariate_normal.pdf(measures[0],

@@ -54,7 +54,6 @@ def compute_non_detection_intensity(predicted_intensity, prob_detection):
 
 
 def update_intensity(predicted_intensity, measurements, meas_model, meas_noise, prob_detection, clutter_model):
-def update(predicted_intensity, measurements, meas_model, meas_noise, prob_detection, clutter_model, pool):
     updated_intensity = list()
     # For each predicted components, create a set of updated components handling the prob of non detection
     updated_intensity.extend(compute_non_detection_intensity(predicted_intensity, prob_detection))

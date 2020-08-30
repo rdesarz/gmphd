@@ -1,5 +1,5 @@
 from unittest import TestCase
-from gmphd.prediction import predict
+from gmphd.prediction import predict_intensity
 from gmphd.gaussian_component import GaussianComponent
 import numpy as np
 
@@ -37,7 +37,7 @@ class TestPrediction(TestCase):
         gaussian_components = list()
         gaussian_components.append(GaussianComponent(mean, covariance, weight))
 
-        predict(gaussian_components, dynamic_model, process_noise, prob_survival, TestBirthModel())
+        predict_intensity(gaussian_components, dynamic_model, process_noise, prob_survival, TestBirthModel())
 
         self.assertTrue(np.allclose(gaussian_components[0].mean, [1.5, 1.5, 0.5, 0.5]))
         self.assertTrue(np.allclose(gaussian_components[0].covariance, np.array([[2.05, 0.05, 1.05, 0.05],
@@ -73,7 +73,7 @@ class TestPrediction(TestCase):
         gaussian_components.append(GaussianComponent(mean, covariance, weight))
         gaussian_components.append(GaussianComponent(mean, covariance, weight))
 
-        predict(gaussian_components, dynamic_model, process_noise, prob_survival, TestBirthModel())
+        predict_intensity(gaussian_components, dynamic_model, process_noise, prob_survival, TestBirthModel())
 
         self.assertTrue(np.allclose(gaussian_components[0].mean, [1.5, 1.5, 0.5, 0.5]))
         self.assertTrue(np.allclose(gaussian_components[0].covariance, np.array([[2.05, 0.05, 1.05, 0.05],
