@@ -3,7 +3,7 @@ import numpy as np
 
 from gmphd.gaussian_component import GaussianComponent
 from gmphd.update import *
-import gmphd.clutter_model as clutter_model
+import gmphd.clutter_models as clutter_model
 
 # Parameters for the tests
 gaussian_mean = np.array([1., 1., 0.5, 0.5]).transpose()

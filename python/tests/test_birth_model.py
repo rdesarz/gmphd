@@ -1,5 +1,5 @@
 from unittest import TestCase
-from gmphd.birth_model import *
+from gmphd.birth_models import *
 
 
 class TestBirthModel(TestCase):

@@ -1,11 +1,10 @@
 import numpy as np
 from numpy import float64
 from gmphd.gaussian_component import GaussianComponent
-import copy
 
 
 # Birth model which expects target to appear on the two lateral sides of a square field of view
-class SidesOfFovBirthModel:
+class SquaredFieldOfView:
     def __init__(self, width, depth, step=1.0):
         self.width = width
         self.depth = depth

@@ -4,12 +4,12 @@ from math import fsum
 from gmphd.gaussian_component import GaussianComponent
 
 
-def prune(posterior_intensity, truncation_threshold):
+def apply_pruning(posterior_intensity, truncation_threshold):
     posterior_intensity = [gaussian for gaussian in posterior_intensity if gaussian.weight >= truncation_threshold]
     return posterior_intensity
 
 
-def merging(posterior_intensity, merge_threshold):
+def apply_merging(posterior_intensity, merge_threshold):
     # The merging algorithm process the components in sorted order based on their weight
     posterior_intensity.sort(key=lambda gaussian: gaussian.weight, reverse=True)
 

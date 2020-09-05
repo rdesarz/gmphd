@@ -1,6 +1,6 @@
 from gmphd.update import update_intensity
 from gmphd.prediction import predict_intensity
-from gmphd.postprocessing import prune, merging
+from gmphd.postprocessing import apply_pruning, apply_merging
 
 
 class GaussianMixturePhdFilter:
@@ -19,20 +19,18 @@ class GaussianMixturePhdFilter:
         self.pruning_threshold = pruning_threshold
         self.merging_threshold = merging_threshold
 
+    def predict(self):
+        predict_intensity(self.current_intensity, self.dynamic_model, self.process_noise, self.prob_survival,
+                          self.birth_intensity)
 
-def predict(self):
-    predict_intensity(self.current_intensity, self.dynamic_model, self.process_noise,
-                      self.prob_survival,
-                      self.birth_intensity)
-    prune(self.current_intensity, self.pruning_threshold)
-    merging(self.current_intensity, self.merging_threshold)
+    def update(self, measurements):
+        update_intensity(self.current_intensity, measurements, self.measurement_model, self.measurement_noise,
+                         self.prob_detection, self.clutter_model)
+        apply_pruning(self.current_intensity, self.pruning_threshold)
+        apply_merging(self.current_intensity, self.merging_threshold)
 
+    def get_intensity(self):
+        return self.current_intensity
 
-def update(self, measurements):
-    update_intensity(self.current_intensity, measurements, self.measurement_model, self.measurement_noise,
-                     self.prob_detection,
-                     self.clutter_model)
-
-
-def get_intensity(self):
-    return self.current_intensity
+    def get_extracted_targets(self):
+        return [component for component in self.current_intensity if component.weight > 0.5]

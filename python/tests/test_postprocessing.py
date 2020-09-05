@@ -19,7 +19,7 @@ class TestPostprocessing(TestCase):
         posterior_intensity.append(GaussianComponent(gaussian_mean, gaussian_cov, truncation_threshold))
         posterior_intensity.append(GaussianComponent(gaussian_mean, gaussian_cov, 0.01))
 
-        posterior_intensity = prune(posterior_intensity, truncation_threshold)
+        posterior_intensity = apply_pruning(posterior_intensity, truncation_threshold)
 
         self.assertEqual(len(posterior_intensity), 2)
         self.assertAlmostEqual(posterior_intensity[0].weight, 1.)
@@ -69,7 +69,7 @@ class TestPostprocessing(TestCase):
 
         posterior_intensity = [gaussian_1, gaussian_2, gaussian_3]
 
-        posterior_intensity = merging(posterior_intensity, 0.5)
+        posterior_intensity = apply_merging(posterior_intensity, 0.5)
 
         self.assertEqual(len(posterior_intensity), 2)
 
@@ -85,7 +85,7 @@ class TestPostprocessing(TestCase):
 
         posterior_intensity = [gaussian_2, gaussian_3, gaussian_1]
 
-        posterior_intensity = merging(posterior_intensity, 0.5)
+        posterior_intensity = apply_merging(posterior_intensity, 0.5)
 
         self.assertEqual(len(posterior_intensity), 2)
         self.assertAlmostEqual(posterior_intensity[0].weight, 0.9)
@@ -103,13 +103,13 @@ class TestPostprocessing(TestCase):
 
         posterior_intensity = [gaussian_2, gaussian_3, gaussian_1, gaussian_4]
 
-        posterior_intensity = merging(posterior_intensity, 0.5)
+        posterior_intensity = apply_merging(posterior_intensity, 0.5)
 
         self.assertEqual(len(posterior_intensity), 2)
 
     def test_merge_empty_intensity(self):
         posterior_intensity = []
 
-        posterior_intensity = merging(posterior_intensity, 0.5)
+        posterior_intensity = apply_merging(posterior_intensity, 0.5)
 
         self.assertEqual(len(posterior_intensity), 0)
