@@ -6,7 +6,7 @@ from gmphd.postprocessing import apply_pruning, apply_merging
 class GaussianMixturePhdFilter:
     def __init__(self, dynamic_model, process_noise, prob_survival, birth_intensity,
                  measurement_model, measurement_noise, prob_detection, clutter_model, pruning_threshold,
-                 merging_threshold):
+                 merging_threshold, extraction_threshold):
         self.dynamic_model = dynamic_model
         self.process_noise = process_noise
         self.prob_survival = prob_survival
@@ -18,6 +18,7 @@ class GaussianMixturePhdFilter:
         self.current_intensity = birth_intensity
         self.pruning_threshold = pruning_threshold
         self.merging_threshold = merging_threshold
+        self.extraction_threshold = extraction_threshold
 
     def predict(self):
         predict_intensity(self.current_intensity, self.dynamic_model, self.process_noise, self.prob_survival,
@@ -33,4 +34,4 @@ class GaussianMixturePhdFilter:
         return self.current_intensity
 
     def get_extracted_targets(self):
-        return [component for component in self.current_intensity if component.weight > 0.5]
+        return [component for component in self.current_intensity if component.weight > self.extraction_threshold]
