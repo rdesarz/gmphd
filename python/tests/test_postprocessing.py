@@ -1,7 +1,7 @@
 import numpy as np
 from unittest import TestCase
-from gmphd.gaussian_component import GaussianComponent
 from gmphd.postprocessing import *
+
 
 gaussian_mean = np.array([1., 1., 0.5, 0.5]).transpose()
 gaussian_cov = np.array([[1., 0., 0., 0.],
