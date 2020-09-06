@@ -15,9 +15,9 @@ class SquaredFieldOfView:
 
         # Birth intensity on right side of FOV
         for depth in np.arange(0., self.depth, self.step):
-            mean = np.array([self.width / 2., depth, -0.2, 0.1], dtype=float64).transpose()
+            mean = np.array([self.width / 2., depth, -0.2, 0.], dtype=float64).transpose()
             covariance = np.array([[self.step, 0., 0., 0.],
-                                   [0., 0.2, 0., 0.],
+                                   [0., 0.5, 0., 0.],
                                    [0., 0., 0.1, 0.],
                                    [0., 0., 0., 0.1]], dtype=float64)
             weight = float64(0.1)
@@ -25,9 +25,9 @@ class SquaredFieldOfView:
 
         # Birth intensity on left side of FOV
         for depth in np.arange(0., self.depth, self.step):
-            mean = np.array([-self.width / 2., depth, 0.2, 0.1], dtype=float64).transpose()
+            mean = np.array([-self.width / 2., depth, 0.1, 0.], dtype=float64).transpose()
             covariance = np.array([[self.step, 0., 0., 0.],
-                                   [0., 0.2, 0., 0.],
+                                   [0., 0.5, 0., 0.],
                                    [0., 0., 0.1, 0.],
                                    [0., 0., 0., 0.1]], dtype=float64)
             weight = float64(0.1)
