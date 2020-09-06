@@ -15,10 +15,10 @@ class GaussianMixturePhdFilter:
         self.measurement_noise = measurement_noise
         self.prob_detection = prob_detection
         self.clutter_model = clutter_model
-        self.current_intensity = birth_intensity
         self.pruning_threshold = pruning_threshold
         self.merging_threshold = merging_threshold
         self.extraction_threshold = extraction_threshold
+        self.current_intensity = list()
 
     def predict(self):
         predict_intensity(self.current_intensity, self.dynamic_model, self.process_noise, self.prob_survival,
