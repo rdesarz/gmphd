@@ -20,9 +20,9 @@ class GaussianMixturePhdFilter:
         self.extraction_threshold = extraction_threshold
         self.current_intensity = list()
 
-    def predict(self):
-        predict_intensity(self.current_intensity, self.dynamic_model, self.process_noise, self.prob_survival,
-                          self.birth_intensity)
+    def predict(self, delta_t):
+        predict_intensity(self.current_intensity, self.dynamic_model(delta_t), self.process_noise(delta_t),
+                          self.prob_survival, self.birth_intensity)
 
     def update(self, measurements):
         update_intensity(self.current_intensity, measurements, self.measurement_model, self.measurement_noise,
